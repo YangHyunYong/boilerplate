@@ -6,8 +6,14 @@ const cookieParser = require('cookie-parser')
 const config = require('./config/key')
 const { User } = require("./models/User")
 const { auth } = require('./middleware/auth')
+const session = require('express-session')
 //application/x-www-form-urlencoded 형태를 분석, 가져오는데 사용
 app.use(bodyParser.urlencoded({extended: true}))
+app.use(session({
+    secret: 'asdf123',
+    resave: false,
+    saveUninitialized: true,
+  })); 
 
 //application/json 형태를 분석, 가져오는데 사용
 app.use(bodyParser.json())
@@ -25,8 +31,14 @@ app.get('/', (req, res) => {
 })
 
 app.get('/api/hello', (req,res)=>{
-    
-    res.send('안녕하세요?')
+    res.send('hi '+req.session.name);
+})
+
+app.get('/api/session', (req,res)=>{
+    req.session.name = 'yuddomack';
+    req.session.save(() => {
+    res.redirect('/api/hello');
+  })
 })
 
 app.post('/api/users/register', (req,res)=>{
